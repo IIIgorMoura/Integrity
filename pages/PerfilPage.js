@@ -94,7 +94,7 @@ const PerfilPage = ({ navigation }) => {
           <Text>Função: {funcionario.CPF}</Text>
           <Text>Função: {funcionario.dataNascimento}</Text>
           <Text>Função: {funcionario.estadoCivil}</Text>
-          
+
         </View>
       )}
 
@@ -110,9 +110,19 @@ const PerfilPage = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  buttonContainer: { flexDirection: "row", justifyContent: "space-between", marginBottom: 16 },
-  tarefaItem: { padding: 8, borderWidth: 1, marginBottom: 8 },
+  container: {
+    flex: 1,
+    padding: 16 },
+
+  buttonContainer: { flexDirection: "row",
+  justifyContent: "space-between", 
+  marginBottom: 16 },
+
+  tarefaItem: { 
+    padding: 8,
+    borderWidth: 1,
+    marginBottom: 8 },
+
 });
 
 export default PerfilPage;
