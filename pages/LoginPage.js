@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { db } from "../configs/firebaseConfig";
@@ -69,17 +69,17 @@ const LoginPage = ({ navigation }) => {
       </LinearGradient>
       <View style={styles.inputs}>
         <View style={styles.inputos}>
-          <Text style={styles.Texto}>Email:</Text></View>
+          <Text style={styles.Texto}>Email:</Text>
+        </View>
         <TextInput
           style={styles.input}
           value={email}
           onChangeText={setEmail}
           placeholder="Digite seu email"
         />
-
-
         <View style={styles.inputos}>
-          <Text style={styles.Texto}>Senha:</Text></View>
+          <Text style={styles.Texto}>Senha:</Text>
+        </View>
         <TextInput
           style={styles.input}
           value={password}
@@ -87,11 +87,10 @@ const LoginPage = ({ navigation }) => {
           placeholder="Digite sua senha"
           secureTextEntry
         />
-
-
-        <Button title="Entrar" onPress={loginUser} />
+        <TouchableOpacity style={styles.button} onPress={loginUser}>
+          <Text style={styles.buttonText}>Entrar</Text>
+        </TouchableOpacity>
       </View>
-
     </View>
   );
 };
@@ -104,11 +103,12 @@ const styles = StyleSheet.create({
   },
   Texto: {
     fontFamily: 'Poppins-Regular',
+    fontSize: 16,
+    color: '#fff',
   },
   inputs: {
     display: 'flex',
-    width: '100%',
-    height: 'auto',
+    width: '80%',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
@@ -116,15 +116,20 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
+    borderRadius: 12, // Bordas arredondadas
     marginBottom: 12,
     padding: 10,
-    width: "90%",
+    width: "100%",
+    backgroundColor: '#fff',
+    fontSize: 16,
+    color: '#333',
   },
   inputos: {
     display: 'flex',
     flexDirection: 'column',
-    width: "90%",
+    width: "100%",
     alignItems: 'flex-start',
+    marginBottom: 10,
   },
   bemvindo: {
     paddingTop: '20%',
@@ -135,6 +140,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderBottomRightRadius: 82,
     borderBottomLeftRadius: 82,
+  },
+  text: {
+    fontSize: 32,
+    fontFamily: 'Poppins-Regular',
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  text2: {
+    fontSize: 18,
+    fontFamily: 'Poppins-Regular',
+    color: '#fff',
+  },
+  button: {
+    backgroundColor: '#155576', // Cor do botão
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25, // Bordas mais arredondadas
+    marginTop: 20,
+    width: '100%',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 
