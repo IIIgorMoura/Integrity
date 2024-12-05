@@ -64,7 +64,7 @@ const LoginPage = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <LinearGradient colors={['#155576b3', '#46201B']} style={styles.bemvindo}>
-        
+
         <Text style={styles.text}>BEM-VINDO!</Text>
         <Text style={styles.text2}>Faça login para continuar</Text>
       </LinearGradient>
@@ -124,7 +124,8 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: '#161616',
     fontSize: 16,
-    color: '#333',
+    color: '#fff',
+    
   },
   inputos: {
     display: 'flex',
