@@ -64,6 +64,7 @@ const LoginPage = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <LinearGradient colors={['#155576b3', '#46201B']} style={styles.bemvindo}>
+        
         <Text style={styles.text}>BEM-VINDO!</Text>
         <Text style={styles.text2}>Faça login para continuar</Text>
       </LinearGradient>
@@ -100,9 +101,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
+    backgroundColor: "#161616",
   },
   Texto: {
-    fontFamily: 'Poppins-Regular',
+   fontWeight:"thin", 
     fontSize: 16,
     color: '#fff',
   },
@@ -115,12 +117,12 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   input: {
-    borderWidth: 1,
-    borderRadius: 12, // Bordas arredondadas
-    marginBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#fff",
+    marginBottom: 20,
     padding: 10,
     width: "100%",
-    backgroundColor: '#fff',
+    backgroundColor: '#161616',
     fontSize: 16,
     color: '#333',
   },
@@ -143,23 +145,31 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 32,
-    fontFamily: 'Poppins-Regular',
+    fontWeight: "bold",
     color: '#fff',
     fontWeight: 'bold',
   },
   text2: {
     fontSize: 18,
-    fontFamily: 'Poppins-Regular',
+   fontWeight: "light",
     color: '#fff',
   },
   button: {
-    backgroundColor: '#155576', // Cor do botão
+    backgroundColor: '#264357',
     paddingVertical: 15,
     paddingHorizontal: 30,
-    borderRadius: 25, // Bordas mais arredondadas
-    marginTop: 20,
+    borderRadius: 20, 
+    marginTop: 30,
     width: '100%',
     alignItems: 'center',
+    shadowColor: '#fff',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 2,
   },
   buttonText: {
     color: '#fff',
