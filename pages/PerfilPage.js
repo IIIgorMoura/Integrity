@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, FlatList, Switch, StyleSheet } from "react-native";
+import { View, Text, Button, FlatList, Switch, StyleSheet, TouchableOpacity } from "react-native";
 import { db } from "../configs/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const PerfilPage = ({ navigation }) => {
   const [section, setSection] = useState("tarefas");
@@ -63,46 +64,78 @@ const PerfilPage = ({ navigation }) => {
     navigation.navigate("Login");
   };
 
+  // Função para calcular a cor da bolinha e o fundo da tarefa
+  const getStatusColor = (prazoFinalizacao) => {
+    const currentDate = new Date();
+    const deadline = new Date(prazoFinalizacao);
+    const timeDiff = deadline - currentDate;
+    const daysDiff = timeDiff / (1000 * 3600 * 24); // Convertendo de milissegundos para dias
+
+    if (daysDiff < 0) {
+      return { circleColor: "red", backgroundColor: "#d3d3d3" }; // Vencida - bolinha vermelha, fundo cinza
+    } else if (daysDiff <= 7) {
+      return { circleColor: "yellow", backgroundColor: "#fff" }; // Faltando 7 dias ou menos - bolinha amarela
+    } else {
+      return { circleColor: "green", backgroundColor: "#fff" }; // Dentro do prazo - bolinha verde
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.buttonContainer}>
-        <Button title="Tarefas" onPress={() => setSection("tarefas")} />
-        <Button title="Meu Perfil" onPress={() => setSection("perfil")} />
-        <Button title="Configurações" onPress={() => setSection("configuracoes")} />
+        <TouchableOpacity style={styles.button} onPress={() => setSection("tarefas")}>
+          <Icon name="tasks" size={20} color="#fff" />
+          <Text style={styles.buttonText}>Tarefas</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => setSection("perfil")}>
+          <Icon name="user" size={20} color="#fff" />
+          <Text style={styles.buttonText}>Meu Perfil</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => setSection("configuracoes")}>
+          <Icon name="cogs" size={20} color="#fff" />
+          <Text style={styles.buttonText}>Configurações</Text>
+        </TouchableOpacity>
       </View>
 
       {section === "tarefas" && (
         <FlatList
           data={tarefas}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.tarefaItem}>
-              <Text>{item.objetivo}</Text>
-              <Text>Prazo: {item.prazoFinalizacao}</Text>
-            </View>
-          )}
+          renderItem={({ item }) => {
+            const { circleColor, backgroundColor } = getStatusColor(item.prazoFinalizacao); // Pegando a cor da bolinha e fundo
+            return (
+              <View style={[styles.tarefaItem, { backgroundColor }]}>
+                <View style={styles.tarefaStatusContainer}>
+                  <View style={[styles.statusCircle, { backgroundColor: circleColor }]} />
+                  <Text style={styles.tarefaTitle}>{item.objetivo}</Text>
+                </View>
+                <Text style={styles.tarefaPrazo}>Prazo: {item.prazoFinalizacao}</Text>
+              </View>
+            );
+          }}
         />
       )}
 
       {section === "perfil" && funcionario && (
-        <View>
-          <Text>Nome: {funcionario.nome}</Text>
-          <Text>Função: {funcionario.funcao}</Text>
-          <Text>Email: {funcionario.email}</Text>
-          <Text>Telefone: {funcionario.telefone}</Text>
-          <Text>Função: {funcionario.tipoContratacao}</Text>
-          <Text>Função: {funcionario.CPF}</Text>
-          <Text>Função: {funcionario.dataNascimento}</Text>
-          <Text>Função: {funcionario.estadoCivil}</Text>
-
+        <View style={styles.perfilContainer}>
+          <Text style={styles.perfilText}>Nome: {funcionario.nome}</Text>
+          <Text style={styles.perfilText}>Função: {funcionario.funcao}</Text>
+          <Text style={styles.perfilText}>Email: {funcionario.email}</Text>
+          <Text style={styles.perfilText}>Telefone: {funcionario.telefone}</Text>
+          <Text style={styles.perfilText}>Tipo de Contratação: {funcionario.tipoContratacao}</Text>
+          <Text style={styles.perfilText}>CPF: {funcionario.CPF}</Text>
+          <Text style={styles.perfilText}>Data de Nascimento: {funcionario.dataNascimento}</Text>
+          <Text style={styles.perfilText}>Estado Civil: {funcionario.estadoCivil}</Text>
         </View>
       )}
 
       {section === "configuracoes" && (
-        <View>
-          <Text>Modo Escuro:</Text>
+        <View style={styles.configContainer}>
+          <Text style={styles.configText}>Modo Escuro:</Text>
           <Switch value={isDarkMode} onValueChange={setIsDarkMode} />
-          <Button title="Sair da Conta" onPress={logout} />
+          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+            <Text style={styles.buttonText}>Sair da Conta</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -112,17 +145,82 @@ const PerfilPage = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16 },
-
-  buttonContainer: { flexDirection: "row",
-  justifyContent: "space-between", 
-  marginBottom: 16 },
-
-  tarefaItem: { 
-    padding: 8,
-    borderWidth: 1,
-    marginBottom: 8 },
-
+    padding: 16,
+    backgroundColor: "#f4f4f4",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  button: {
+    backgroundColor: "#155576",
+    borderRadius: 30,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "30%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-evenly",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 8,
+  },
+  tarefaItem: {
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  tarefaStatusContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  statusCircle: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  tarefaTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  tarefaPrazo: {
+    fontSize: 14,
+    color: "#555",
+  },
+  perfilContainer: {
+    marginTop: 20,
+  },
+  perfilText: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  configContainer: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  configText: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  logoutButton: {
+    backgroundColor: "#d9534f",
+    borderRadius: 30,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginTop: 20,
+  },
 });
 
 export default PerfilPage;
