@@ -83,10 +83,10 @@ const PerfilPage = ({ navigation }) => {
   };
 
   return (
-    <LinearGradient colors={['#1B2A33', '#271A18', '#161616']} style={styles.container}>
+    <LinearGradient colors={['#1A2C36', '#291B1A', '#161616']} style={styles.container}>
       <View style={styles.apresentacao}>
-
-
+        <View style={styles.lugar}></View>
+        <View style={styles.identificacao}></View>
 
       </View>
       <View style={styles.buttonContainer}>
@@ -248,6 +248,7 @@ const styles = StyleSheet.create({
     display: "flex",
     width: "100%",
     marginTop: 10,
+    padding: 10,
   },
   perfilText: {
     fontSize: 16,
@@ -298,6 +299,7 @@ const styles = StyleSheet.create({
   apresentacao: {
     display: "flex",
     width: "100%",
+    height: "25%",
   }
 
 });
