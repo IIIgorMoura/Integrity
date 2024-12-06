@@ -83,10 +83,10 @@ const PerfilPage = ({ navigation }) => {
   };
 
   return (
-    <LinearGradient colors={['#1B2A33', '#271A18','#161616']} style={styles.container}>
+    <LinearGradient colors={['#1A2C36', '#291B1A', '#161616']} style={styles.container}>
       <View style={styles.apresentacao}>
-
-
+        <View style={styles.lugar}></View>
+        <View style={styles.identificacao}></View>
 
       </View>
       <View style={styles.buttonContainer}>
@@ -145,40 +145,25 @@ const PerfilPage = ({ navigation }) => {
 
       {section === "perfil" && funcionario && (
 
-        <ScrollView style={styles.perfilContainer}>
-          <View style={styles.dados}>
-            <Text style={styles.titulos}>Nome:</Text>
-            <Text style={styles.perfilText}>{funcionario.nome}</Text>
-          </View>
-          <View style={styles.dados}>
-            <Text style={styles.titulos}>Função:</Text>
-            <Text style={styles.perfilText}>{funcionario.funcao}</Text>
-          </View>
-          <View style={styles.dados}>
-            <Text style={styles.titulos}>Email:</Text>
-            <Text style={styles.perfilText}>{funcionario.email}</Text>
-          </View>
-          <View style={styles.dados}>
-            <Text style={styles.titulos}>Telefone:</Text>
-            <Text style={styles.perfilText}>{funcionario.telefone}</Text>
-          </View>
-          <View style={styles.dados}>
-            <Text style={styles.titulos}>Tipo de Contratação:</Text>
-            <Text style={styles.perfilText}>{funcionario.tipoContratacao}</Text>
-          </View>
-          <View style={styles.dados}>
-            <Text style={styles.titulos}>CPF:</Text>
-            <Text style={styles.perfilText}>{funcionario.CPF}</Text>
-          </View>
-          <View style={styles.dados}>
-            <Text style={styles.titulos}>Data de Nascimento:</Text>
-            <Text style={styles.perfilText}>{funcionario.dataNascimento}</Text>
-          </View>
-          <View style={styles.dados}>
-            <Text style={styles.titulos}>Estado Civil:</Text>
-            <Text style={styles.perfilText}>{funcionario.estadoCivil}</Text>
-          </View>
-        </ScrollView>
+        <FlatList
+          data={[
+            { label: "Nome", value: funcionario.nome },
+            { label: "Função", value: funcionario.funcao },
+            { label: "Email", value: funcionario.email },
+            { label: "Telefone", value: funcionario.telefone },
+            { label: "Tipo de Contratação", value: funcionario.tipoContratacao },
+            { label: "CPF", value: funcionario.CPF },
+            { label: "Data de Nascimento", value: funcionario.dataNascimento },
+            { label: "Estado Civil", value: funcionario.estadoCivil },
+          ]}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.dados}>
+              <Text style={styles.titulos}>{item.label}:</Text>
+              <Text style={styles.perfilText}>{item.value}</Text>
+            </View>
+          )}
+        />
       )}
 
       {section === "configuracoes" && (
@@ -263,6 +248,7 @@ const styles = StyleSheet.create({
     display: "flex",
     width: "100%",
     marginTop: 10,
+    padding: 10,
   },
   perfilText: {
     fontSize: 16,
@@ -310,8 +296,10 @@ const styles = StyleSheet.create({
     height: "40%",
     justifyContent: "flex-end",
   },
-  apresentacao:{
-    
+  apresentacao: {
+    display: "flex",
+    width: "100%",
+    height: "25%",
   }
 
 });

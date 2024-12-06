@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons'; // Importando a bibl
 const Tab = createBottomTabNavigator();
 
 const BottomTabsNavigator = () => (
-  <Tab.Navigator>
+  <Tab.Navigator initialRouteName="Perfil">
     <Tab.Screen 
       name="Presença" 
       component={PresencaPage}
