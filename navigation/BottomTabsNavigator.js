@@ -19,7 +19,7 @@ const BottomTabsNavigator = () => (
       }}
     />
     <Tab.Screen 
-      name="Perfil" 
+      name="Perfil"
       component={PerfilPage}
       options={{
         tabBarIcon: ({ color, size }) => (

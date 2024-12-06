@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, FlatList, Switch, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Button, FlatList, Switch, StyleSheet, TouchableOpacity, } from "react-native";
 import { db } from "../configs/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { ScrollView } from "react-native-web";
 
 const PerfilPage = ({ navigation }) => {
   const [section, setSection] = useState("tarefas");
@@ -118,14 +119,38 @@ const PerfilPage = ({ navigation }) => {
 
       {section === "perfil" && funcionario && (
         <View style={styles.perfilContainer}>
-          <Text style={styles.perfilText}>Nome: {funcionario.nome}</Text>
-          <Text style={styles.perfilText}>Função: {funcionario.funcao}</Text>
-          <Text style={styles.perfilText}>Email: {funcionario.email}</Text>
-          <Text style={styles.perfilText}>Telefone: {funcionario.telefone}</Text>
-          <Text style={styles.perfilText}>Tipo de Contratação: {funcionario.tipoContratacao}</Text>
-          <Text style={styles.perfilText}>CPF: {funcionario.CPF}</Text>
-          <Text style={styles.perfilText}>Data de Nascimento: {funcionario.dataNascimento}</Text>
-          <Text style={styles.perfilText}>Estado Civil: {funcionario.estadoCivil}</Text>
+          <View style={styles.dados}>
+            <Text style={styles.titulos}>Nome:</Text>
+            <Text style={styles.perfilText}>{funcionario.nome}</Text>
+          </View>
+          <View style={styles.dados}>
+            <Text style={styles.titulos}>Função:</Text>
+            <Text style={styles.perfilText}>{funcionario.funcao}</Text>
+          </View>
+          <View style={styles.dados}>
+            <Text style={styles.titulos}>Email:</Text>
+            <Text style={styles.perfilText}>{funcionario.email}</Text>
+          </View>
+          <View style={styles.dados}>
+            <Text style={styles.titulos}>Telefone:</Text>
+            <Text style={styles.perfilText}>{funcionario.telefone}</Text>
+          </View>
+          <View style={styles.dados}>
+            <Text style={styles.titulos}>Tipo de Contratação:</Text>
+            <Text style={styles.perfilText}>{funcionario.tipoContratacao}</Text>
+          </View>
+          <View style={styles.dados}>
+            <Text style={styles.titulos}>CPF:</Text>
+            <Text style={styles.perfilText}>{funcionario.CPF}</Text>
+          </View>
+          <View style={styles.dados}>
+            <Text style={styles.titulos}>Data de Nascimento:</Text>
+            <Text style={styles.perfilText}>{funcionario.dataNascimento}</Text>
+          </View>
+          <View style={styles.dados}>
+            <Text style={styles.titulos}>Estado Civil:</Text>
+            <Text style={styles.perfilText}>{funcionario.estadoCivil}</Text>
+          </View>
         </View>
       )}
 
@@ -146,7 +171,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#f4f4f4",
+    backgroundColor: "#161616",
   },
   buttonContainer: {
     flexDirection: "row",
@@ -155,20 +180,18 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#155576",
-    borderRadius: 30,
+    borderRadius: 20,
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     alignItems: "center",
     justifyContent: "center",
     width: "30%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-evenly",
+    flexDirection: "column",
   },
   buttonText: {
     color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 12,
+    fontWeight: "regular",
     marginLeft: 8,
   },
   tarefaItem: {
@@ -200,11 +223,20 @@ const styles = StyleSheet.create({
     color: "#555",
   },
   perfilContainer: {
+    display: "flex",
+    width: "100%",
     marginTop: 20,
+    justifyContent: "center",
+    alignItems: "center",
   },
   perfilText: {
     fontSize: 16,
-    marginBottom: 8,
+    marginBottom: 5,
+    color: "#fff",
+  },
+  titulos: {
+    fontSize: 12,
+    color: "#fff",
   },
   configContainer: {
     marginTop: 20,
@@ -220,6 +252,18 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     marginTop: 20,
+  },
+  dados: {
+    display: "flex",
+    width: "90%",
+    height: "auto",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    flexDirection: "column",
+    marginTop: 10,
+    backgroundColor: "#303030",
+    padding: 10,
+    borderRadius: 10,
   },
 });
 
