@@ -87,7 +87,7 @@ const PerfilPage = ({ navigation }) => {
       <View style={styles.apresentacao}>
 
 
-        
+
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
@@ -309,6 +309,9 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "40%",
     justifyContent: "flex-end",
+  },
+  apresentacao:{
+    
   }
 
 });
