@@ -15,43 +15,46 @@ const LoginPage = ({ navigation }) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-
-      // Verifica se o usuário é um administrador
+  
+      // Verifica se o usuário é administrador
       const empresasRef = collection(db, "empresas");
       const adminQuery = query(empresasRef, where("uidAdministrador", "==", user.uid));
       const adminSnapshot = await getDocs(adminQuery);
-
+  
       if (!adminSnapshot.empty) {
         adminSnapshot.forEach(async (doc) => {
           const empresaId = doc.id;
-          const empresaData = doc.data();
           await AsyncStorage.setItem("usuario", JSON.stringify(user));
           await AsyncStorage.setItem("empresaId", empresaId);
-          navigation.navigate("Perfil");
+          navigation.navigate("Perfil"); // Redirecionar para perfil do administrador
         });
         return;
       }
-
+  
       // Verifica se o usuário é funcionário
-      const empresasSnapshot = await getDocs(empresasRef);
       let empresaIdFuncionario = null;
-
+      let funcionarioId = null;
+      const empresasSnapshot = await getDocs(empresasRef);
       for (const empresaDoc of empresasSnapshot.docs) {
         const empresaId = empresaDoc.id;
         const funcionariosRef = collection(db, `empresas/${empresaId}/funcionarios`);
         const funcionarioQuery = query(funcionariosRef, where("email", "==", email));
         const funcionarioSnapshot = await getDocs(funcionarioQuery);
-
+  
         if (!funcionarioSnapshot.empty) {
           empresaIdFuncionario = empresaId;
+          funcionarioSnapshot.forEach(doc => {
+            funcionarioId = doc.id; // Obtém o id do funcionário específico
+          });
           break;
         }
       }
-
-      if (empresaIdFuncionario) {
+  
+      if (empresaIdFuncionario && funcionarioId) {
         await AsyncStorage.setItem("usuario", JSON.stringify(user));
         await AsyncStorage.setItem("empresaId", empresaIdFuncionario);
-        navigation.navigate("Perfil");
+        await AsyncStorage.setItem("funcionarioId", funcionarioId); // Armazena o funcionarioId
+        navigation.navigate("Perfil"); // Redirecionar para perfil do funcionário
       } else {
         Alert.alert("Erro", "Nenhuma empresa associada ao seu usuário.");
       }

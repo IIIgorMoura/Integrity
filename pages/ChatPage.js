@@ -1,271 +1,169 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import React, { useState, useEffect } from "react";
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import { db } from "../configs/firebaseConfig";
+import { collection, addDoc, query, orderBy, onSnapshot } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const questionsAndAnswers = [
-  {
-    id: '1',
-    question: 'Como acesso meu perfil?',
-    answer: 'Vá até a página de "perfil" e clique em "meu perfil".',
-  },
-  {
-    id: '2',
-    question: 'Como vejo minhas tarefas?',
-    answer: 'Vá para tela de "perfil" e logo será exibido as tarefas',
-  },
-  {
-    id: '3',
-    question: 'Como verificar a presença?',
-    answer: 'A presença pode ser verificada na página inicial, na seção "Marcadores de Presença".',
-  },
-  {
-    id: '4',
-    question: 'Como usar a tela de "perfil"?',
-    answer: 'Na tela de perfil existem três abas para você navegar, "Tarefas", "meu perfil", "configurações". A tela de configuração é a única que você pode editar, nela existe o modo de visualização, tema claro e tema escuro, e a opção para sair da sua conta.',
-  },
-];
-
-export default function ChatScreen() {
+const ChatPage = () => {
+  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const [inputText, setInputText] = useState('');
-  const [showQuestionSection, setShowQuestionSection] = useState(true);
-  const [isFeedbackAsked, setIsFeedbackAsked] = useState(false);
-  const [isResolved, setIsResolved] = useState(false);
+  const [user, setUser] = useState(null);
+  const [empresaId, setEmpresaId] = useState(null);
+  const [funcionarioId, setFuncionarioId] = useState(null); // Variável para armazenar o funcionarioId
 
-  const flatListRef = useRef();
-
-  // Adiciona a saudação inicial
+  // Carregar dados do usuário e empresa
   useEffect(() => {
-    setMessages([{ id: 'greeting', text: 'Olá, como posso te ajudar?', type: 'received' }]);
+    const loadData = async () => {
+      const storedUsuario = await AsyncStorage.getItem("usuario");
+      const storedEmpresaId = await AsyncStorage.getItem("empresaId");
+      const storedFuncionarioId = await AsyncStorage.getItem("funcionarioId"); // Obtém o funcionarioId
+
+      if (storedUsuario) {
+        setUser(JSON.parse(storedUsuario));
+      }
+      if (storedEmpresaId) {
+        setEmpresaId(storedEmpresaId);
+      }
+      if (storedFuncionarioId) {
+        setFuncionarioId(storedFuncionarioId); // Armazena o funcionarioId
+      }
+    };
+
+    loadData();
   }, []);
 
-  // Função para lidar com a seleção de uma dúvida
-  const handleOptionSelect = (item) => {
-    const newMessages = [
-      ...messages,
-      { id: Math.random().toString(), text: item.question, type: 'sent' },
-      { id: Math.random().toString(), text: item.answer, type: 'received' },
-    ];
-    setMessages(newMessages);
-    setShowQuestionSection(false); // Esconde as perguntas
-    setIsFeedbackAsked(true); // Mostra a pergunta de feedback
-  };
-
-  // Função para lidar com a resposta sobre a utilidade da resposta
-  const handleResolution = (resolved) => {
-    if (resolved) {
-      setMessages([
-        ...messages,
-        { id: Math.random().toString(), text: 'Que bom que conseguimos te ajudar!', type: 'received' },
-      ]);
-      setIsResolved(true);
-      setShowQuestionSection(true); // Volta para a área de dúvidas
-      setIsFeedbackAsked(false); // Esconde a pergunta de feedback
-    } else {
-      setMessages([
-        ...messages,
-        { id: Math.random().toString(), text: 'Vou te encaminhar para um atendente. Um momento...', type: 'received' },
-      ]);
-      setIsFeedbackAsked(false); // Esconde a pergunta de feedback
-    }
-  };
-
-  // Função para enviar uma mensagem
-  const handleSend = () => {
-    if (inputText.trim()) {
-      const newMessages = [
-        ...messages,
-        { id: Math.random().toString(), text: inputText, type: 'sent' },
-      ];
-      setMessages(newMessages);
-      setInputText('');
-
-      // Verifica se a mensagem é um pedido de suporte
-      if (inputText.toLowerCase().includes('suporte') || inputText.toLowerCase().includes('atendente')) {
-        setMessages([
-          ...newMessages,
-          { id: Math.random().toString(), text: 'Você será encaminhado para um atendente. Um momento...', type: 'received' },
-        ]);
-        return; // Interrompe a execução caso o suporte seja solicitado
-      }
-
-      // Verifica se a mensagem não é reconhecida
-      setMessages([
-        ...newMessages,
-        { id: Math.random().toString(), text: 'Desculpe, não consegui entender sua dúvida.', type: 'received' },
-      ]);
-    }
-  };
-
-  // Função para alternar a visibilidade da seção de perguntas
-  const toggleQuestionSection = () => {
-    setShowQuestionSection((prevState) => !prevState);
-  };
-
-  // Garantir que a lista role para a última mensagem
+  // Ouvir as mensagens em tempo real
   useEffect(() => {
-    flatListRef.current?.scrollToEnd({ animated: true });
-  }, [messages]);
+    if (empresaId && funcionarioId) {
+      const messagesRef = collection(db, `empresas/${empresaId}/funcionarios/${funcionarioId}/historicoChat`);
+      const q = query(messagesRef, orderBy("timestamp"));
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const messagesList = querySnapshot.docs.map(doc => ({
+          id: doc.id,  // Incluindo o id do documento
+          ...doc.data(),
+        }));
+        setMessages(messagesList);
+      });
+
+      // Limpar o listener quando a tela for desmontada
+      return () => unsubscribe();
+    }
+  }, [empresaId, funcionarioId]);
+
+  const sendMessage = async () => {
+    if (message.trim() === "") return;
+
+    try {
+      // Garantir que o userName esteja definido
+      const userName = user.displayName || "Usuário desconhecido"; // Valor padrão se displayName não estiver definido
+
+      const messagesRef = collection(db, `empresas/${empresaId}/funcionarios/${funcionarioId}/historicoChat`);
+
+      // Adicionar a mensagem no Firestore
+      await addDoc(messagesRef, {
+        text: message,
+        userId: user.uid,
+        userName: userName, // Certificando-se que o campo userName tem um valor válido
+        timestamp: new Date(),
+      });
+
+      setMessage(""); // Limpar o campo de entrada
+    } catch (error) {
+      console.error("Erro ao enviar mensagem:", error);
+    }
+  };
+
+  const renderMessageItem = ({ item }) => {
+    return (
+      <View style={item.userId === user.uid ? styles.sentMessage : styles.receivedMessage}>
+        <Text style={styles.messageText}>{item.userName}: {item.text}</Text>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
       <FlatList
-        ref={flatListRef}
         data={messages}
-        renderItem={({ item }) => (
-          <View
-            style={[styles.messageBubble, item.type === 'sent' ? styles.sent : styles.received]}
-          >
-            <Text style={styles.messageText}>{item.text}</Text>
-          </View>
-        )}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.chatContainer}
+        renderItem={renderMessageItem}
+        keyExtractor={(item) => item.id}  // Usando o id como chave
+        inverted  // Inverte a lista para que as mensagens mais recentes apareçam no fundo
+        contentContainerStyle={styles.messagesContainer}
       />
 
-      {isFeedbackAsked && (
-        <View style={styles.feedbackContainer}>
-          <Text style={styles.feedbackText}>A resposta foi útil?</Text>
-          <TouchableOpacity style={styles.feedbackButton} onPress={() => handleResolution(true)}>
-            <Text style={styles.feedbackButtonText}>Sim</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.feedbackButton} onPress={() => handleResolution(false)}>
-            <Text style={styles.feedbackButtonText}>Não</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {showQuestionSection && (
-        <View style={styles.questionContainer}>
-          <Text style={styles.questionText}>Qual a sua dúvida?</Text>
-          {questionsAndAnswers.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.questionBubble}
-              onPress={() => handleOptionSelect(item)}
-            >
-              <Text style={styles.questionText}>{item.question}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
-
-      <TouchableOpacity style={styles.toggleButton} onPress={toggleQuestionSection}>
-        <Text style={styles.toggleButtonText}>
-          {showQuestionSection ? 'Recolher Dúvidas' : 'Mostrar Dúvidas'}
-        </Text>
-      </TouchableOpacity>
-
-      <View style={styles.inputContainer}>
-        <TouchableOpacity style={styles.iconButton}>
-          <Icon name="attach-file" size={24} color="#aaa" />
-        </TouchableOpacity>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          value={inputText}
-          onChangeText={setInputText}
-          placeholder="Digite uma mensagem"
-          placeholderTextColor="#bbb"
+          placeholder="Digite sua mensagem..."
+          value={message}
+          onChangeText={setMessage}
+          placeholderTextColor="#aaa"
         />
-        <TouchableOpacity style={styles.iconButton} onPress={handleSend}>
-          <Icon name="send" size={24} color="#007bff" />
+        <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+          <Text style={styles.sendButtonText}>Enviar</Text>
         </TouchableOpacity>
-      </View>
+      </KeyboardAvoidingView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f1f1f1',
-    paddingTop: 30,
+    backgroundColor: "#161616",
   },
-  chatContainer: {
-    padding: 10,
+  messagesContainer: {
+    paddingTop: 10,
+    paddingBottom: 60, // Espaço para o campo de entrada
   },
-  messageBubble: {
-    maxWidth: '75%',
+  sentMessage: {
+    alignSelf: "flex-end",
+    backgroundColor: "#264357",
     padding: 10,
-    marginVertical: 5,
     borderRadius: 10,
+    margin: 5,
+    maxWidth: "80%",
   },
-  sent: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#007bff',
-  },
-  received: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#ddd',
+  receivedMessage: {
+    alignSelf: "flex-start",
+    backgroundColor: "#333",
+    padding: 10,
+    borderRadius: 10,
+    margin: 5,
+    maxWidth: "80%",
   },
   messageText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  questionContainer: {
-    marginTop: 10,
-    paddingHorizontal: 10,
-  },
-  questionBubble: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    marginVertical: 5,
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
-  questionText: {
-    fontSize: 14,
-    color: '#333',
-  },
-  feedbackContainer: {
-    marginTop: 10,
-    paddingHorizontal: 10,
-  },
-  feedbackText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  feedbackButton: {
-    backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 20,
-    marginVertical: 5,
-    alignItems: 'center',
-  },
-  feedbackButtonText: {
-    fontSize: 14,
-    color: '#fff',
+    color: "#fff",
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#222",
     padding: 10,
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
     borderTopWidth: 1,
-    borderTopColor: '#ccc',
-    backgroundColor: '#fff',
+    borderTopColor: "#444",
   },
   input: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    backgroundColor: "#333",
+    color: "#fff",
+    padding: 10,
     borderRadius: 20,
-    padding: 10,
-    marginHorizontal: 10,
-    color: '#333',
+    marginRight: 10,
   },
-  iconButton: {
-    padding: 5,
+  sendButton: {
+    backgroundColor: "#264357",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
   },
-  toggleButton: {
-    alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#fff',
-  },
-  toggleButtonText: {
-    fontSize: 14,
-    color: '#007bff',
+  sendButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
+
+export default ChatPage;
