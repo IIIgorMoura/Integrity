@@ -118,7 +118,7 @@ const PerfilPage = ({ navigation }) => {
       )}
 
       {section === "perfil" && funcionario && (
-        <View style={styles.perfilContainer}>
+        <ScrollView style={styles.perfilContainer}>
           <View style={styles.dados}>
             <Text style={styles.titulos}>Nome:</Text>
             <Text style={styles.perfilText}>{funcionario.nome}</Text>
@@ -151,7 +151,7 @@ const PerfilPage = ({ navigation }) => {
             <Text style={styles.titulos}>Estado Civil:</Text>
             <Text style={styles.perfilText}>{funcionario.estadoCivil}</Text>
           </View>
-        </View>
+        </ScrollView>
       )}
 
       {section === "configuracoes" && (
@@ -174,15 +174,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#161616",
   },
   buttonContainer: {
+    display: "flex",
+    backgroundColor:"#303030" ,
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 16,
+    borderRadius: 20,
   },
   button: {
-    backgroundColor: "#155576",
     borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 10,
+    padding: 10,
     alignItems: "center",
     justifyContent: "center",
     width: "30%",
@@ -192,7 +193,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 12,
     fontWeight: "regular",
-    marginLeft: 8,
   },
   tarefaItem: {
     padding: 12,
@@ -226,8 +226,8 @@ const styles = StyleSheet.create({
     display: "flex",
     width: "100%",
     marginTop: 20,
-    justifyContent: "center",
-    alignItems: "center",
+    // justifyContent: "center",
+    // alignItems: "center",
   },
   perfilText: {
     fontSize: 16,
@@ -255,14 +255,15 @@ const styles = StyleSheet.create({
   },
   dados: {
     display: "flex",
-    width: "90%",
+    width: "95%",
     height: "auto",
     justifyContent: "center",
     alignItems: "flex-start",
     flexDirection: "column",
     marginTop: 10,
     backgroundColor: "#303030",
-    padding: 10,
+    padding: 8,
+    paddingLeft: 20,
     borderRadius: 10,
   },
 });
