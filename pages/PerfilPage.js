@@ -83,7 +83,12 @@ const PerfilPage = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={['#1B2A33', '#271A18','#161616']} style={styles.container}>
+      <View style={styles.apresentacao}>
+
+
+        
+      </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[
@@ -95,7 +100,7 @@ const PerfilPage = ({ navigation }) => {
           <Icon name="tasks" size={20} color="#fff" />
           <Text style={styles.buttonText}>Tarefas</Text>
         </TouchableOpacity>
-{/* ------------------------------------ */}
+        {/* ------------------------------------ */}
         <TouchableOpacity
           style={[
             styles.button,
@@ -103,7 +108,7 @@ const PerfilPage = ({ navigation }) => {
           ]}
           onPress={() => setSection("perfil")}
         >
-           <Icon name="user" size={20} color="#fff" />
+          <Icon name="user" size={20} color="#fff" />
           <Text style={styles.buttonText}>Perfil</Text>
         </TouchableOpacity>
         {/* ----------------------------------- */}
@@ -114,7 +119,7 @@ const PerfilPage = ({ navigation }) => {
           ]}
           onPress={() => setSection("configuracoes")}
         >
-           <Icon name="cogs" size={20} color="#fff" />
+          <Icon name="cogs" size={20} color="#fff" />
           <Text style={styles.buttonText}>configurações</Text>
         </TouchableOpacity>
       </View>
@@ -185,15 +190,15 @@ const PerfilPage = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       )}
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: "#161616",
+    padding: 20,
   },
   buttonContainer: {
     display: "flex",
@@ -219,7 +224,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "30%",
     flexDirection: "column",
-    
+
   },
   buttonText: {
     color: "#fff",
@@ -300,6 +305,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#fff",
   },
+  retangulo: {
+    width: "100%",
+    height: "40%",
+    justifyContent: "flex-end",
+  }
 
 });
 
