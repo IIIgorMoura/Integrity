@@ -5,6 +5,7 @@ import { collection, getDocs } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { ScrollView } from "react-native-web";
+import { LinearGradient } from 'expo-linear-gradient';
 
 const PerfilPage = ({ navigation }) => {
   const [section, setSection] = useState("tarefas");
@@ -84,17 +85,37 @@ const PerfilPage = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => setSection("tarefas")}>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            section === "tarefas" && styles.activeButton,
+          ]}
+          onPress={() => setSection("tarefas")}
+        >
           <Icon name="tasks" size={20} color="#fff" />
           <Text style={styles.buttonText}>Tarefas</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => setSection("perfil")}>
-          <Icon name="user" size={20} color="#fff" />
-          <Text style={styles.buttonText}>Meu Perfil</Text>
+{/* ------------------------------------ */}
+        <TouchableOpacity
+          style={[
+            styles.button,
+            section === "perfil" && styles.activeButton,
+          ]}
+          onPress={() => setSection("perfil")}
+        >
+           <Icon name="user" size={20} color="#fff" />
+          <Text style={styles.buttonText}>Perfil</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => setSection("configuracoes")}>
-          <Icon name="cogs" size={20} color="#fff" />
-          <Text style={styles.buttonText}>Configurações</Text>
+        {/* ----------------------------------- */}
+        <TouchableOpacity
+          style={[
+            styles.button,
+            section === "configuracoes" && styles.activeButton,
+          ]}
+          onPress={() => setSection("configuracoes")}
+        >
+           <Icon name="cogs" size={20} color="#fff" />
+          <Text style={styles.buttonText}>configurações</Text>
         </TouchableOpacity>
       </View>
 
@@ -118,6 +139,7 @@ const PerfilPage = ({ navigation }) => {
       )}
 
       {section === "perfil" && funcionario && (
+
         <ScrollView style={styles.perfilContainer}>
           <View style={styles.dados}>
             <Text style={styles.titulos}>Nome:</Text>
@@ -175,11 +197,20 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     display: "flex",
-    backgroundColor:"#303030" ,
+    backgroundColor: "#303030",
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 16,
     borderRadius: 20,
+    flexWrap: "wrap",
+    shadowColor: '#fff',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 6,
   },
   button: {
     borderRadius: 20,
@@ -188,6 +219,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "30%",
     flexDirection: "column",
+    
   },
   buttonText: {
     color: "#fff",
@@ -225,9 +257,7 @@ const styles = StyleSheet.create({
   perfilContainer: {
     display: "flex",
     width: "100%",
-    marginTop: 20,
-    // justifyContent: "center",
-    // alignItems: "center",
+    marginTop: 10,
   },
   perfilText: {
     fontSize: 16,
@@ -266,6 +296,11 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     borderRadius: 10,
   },
+  activeButton: {
+    borderWidth: 1,
+    borderColor: "#fff",
+  },
+
 });
 
 export default PerfilPage;
