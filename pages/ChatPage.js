@@ -61,7 +61,6 @@ const ChatPage = () => {
     }
 
     try {
-      const userName = user.displayName || "Usuário desconhecido"; 
 
       const messagesRef = collection(db, `empresas/${empresaId}/funcionarios/${funcionarioId}/historicoChat`);
 
@@ -69,7 +68,6 @@ const ChatPage = () => {
       await addDoc(messagesRef, {
         text: message,
         userId: user.uid,
-        userName: userName,
         timestamp: Timestamp.fromDate(new Date()), 
       });
 
@@ -93,7 +91,7 @@ const ChatPage = () => {
     return (
       <View style={item.userId === user.uid ? styles.sentMessage : styles.receivedMessage}>
         <Text style={styles.messageText}>
-          {item.userName && item.userName !== "Usuário desconhecido" ? `${item.userName}: ` : ""}{item.text}
+          {item.text}
         </Text>
       </View>
     );
