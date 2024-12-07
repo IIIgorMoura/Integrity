@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, FlatList, Switch, StyleSheet, TouchableOpacity, Image, } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  FlatList,
+  Switch,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import { db } from "../configs/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient } from "expo-linear-gradient";
 
 const PerfilPage = ({ navigation }) => {
   const [section, setSection] = useState("tarefas");
@@ -12,10 +21,6 @@ const PerfilPage = ({ navigation }) => {
   const [tarefas, setTarefas] = useState([]);
   const [funcionario, setFuncionario] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [usuario, setUsuario] = useState(null);
-
-
-  
 
   useEffect(() => {
     const fetchEmpresaId = async () => {
@@ -25,8 +30,6 @@ const PerfilPage = ({ navigation }) => {
 
     fetchEmpresaId();
   }, []);
-
-  
 
   useEffect(() => {
     if (empresaId) {
@@ -40,8 +43,13 @@ const PerfilPage = ({ navigation }) => {
 
   const fetchTarefas = async () => {
     try {
-      const tarefasSnapshot = await getDocs(collection(db, `empresas/${empresaId}/tarefas`));
-      const tarefasData = tarefasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const tarefasSnapshot = await getDocs(
+        collection(db, `empresas/${empresaId}/tarefas`)
+      );
+      const tarefasData = tarefasSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
       setTarefas(tarefasData);
     } catch (err) {
       console.error("Erro ao buscar tarefas:", err);
@@ -51,11 +59,14 @@ const PerfilPage = ({ navigation }) => {
   const fetchPerfil = async () => {
     try {
       const usuario = JSON.parse(await AsyncStorage.getItem("usuario"));
-      const funcionariosRef = collection(db, `empresas/${empresaId}/funcionarios`);
+      const funcionariosRef = collection(
+        db,
+        `empresas/${empresaId}/funcionarios`
+      );
       const funcionariosSnapshot = await getDocs(funcionariosRef);
       const funcionarioData = funcionariosSnapshot.docs
-        .map(doc => doc.data())
-        .find(func => func.email === usuario.email);
+        .map((doc) => doc.data())
+        .find((func) => func.email === usuario.email);
 
       if (funcionarioData) {
         setFuncionario(funcionarioData);
@@ -71,27 +82,30 @@ const PerfilPage = ({ navigation }) => {
     navigation.navigate("Login");
   };
 
-  // Função para calcular a cor da bolinha e o fundo da tarefa
   const getStatusColor = (prazoFinalizacao) => {
     const currentDate = new Date();
     const deadline = new Date(prazoFinalizacao);
     const timeDiff = deadline - currentDate;
-    const daysDiff = timeDiff / (1000 * 3600 * 24); // Convertendo de milissegundos para dias
+    const daysDiff = timeDiff / (1000 * 3600 * 24);
 
     if (daysDiff < 0) {
-      return { circleColor: "red", backgroundColor: "#d3d3d3" }; // Vencida - bolinha vermelha, fundo cinza
+      return { circleColor: "red", backgroundColor: "#d3d3d3" };
     } else if (daysDiff <= 7) {
-      return { circleColor: "yellow", backgroundColor: "#fff" }; // Faltando 7 dias ou menos - bolinha amarela
+      return { circleColor: "yellow", backgroundColor: "#fff" };
     } else {
-      return { circleColor: "green", backgroundColor: "#fff" }; // Dentro do prazo - bolinha verde
+      return { circleColor: "green", backgroundColor: "#fff" };
     }
   };
 
   return (
-    <LinearGradient colors={['#1A2C36', '#291B1A', '#161616']} style={styles.container}>
+    <LinearGradient
+      colors={["#1A2C36", "#291B1A", "#161616"]}
+      style={styles.container}
+    >
       <View style={styles.apresentacao}>
-         <Text style={styles.bemvindo}>Olá </Text> {/*// botar o usuario aqui */}
-        <Text style={styles.identificacao}></Text>
+        <Text style={styles.bemvindo}>
+          Olá {funcionario?.nome || "Visitante"}
+        </Text>
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
@@ -104,7 +118,6 @@ const PerfilPage = ({ navigation }) => {
           <Icon name="tasks" size={20} color="#fff" />
           <Text style={styles.buttonText}>Tarefas</Text>
         </TouchableOpacity>
-        {/* ------------------------------------ */}
         <TouchableOpacity
           style={[
             styles.button,
@@ -115,7 +128,6 @@ const PerfilPage = ({ navigation }) => {
           <Icon name="user" size={20} color="#fff" />
           <Text style={styles.buttonText}>Perfil</Text>
         </TouchableOpacity>
-        {/* ----------------------------------- */}
         <TouchableOpacity
           style={[
             styles.button,
@@ -124,7 +136,7 @@ const PerfilPage = ({ navigation }) => {
           onPress={() => setSection("configuracoes")}
         >
           <Icon name="cogs" size={20} color="#fff" />
-          <Text style={styles.buttonText}>configurações</Text>
+          <Text style={styles.buttonText}>Configurações</Text>
         </TouchableOpacity>
       </View>
 
@@ -133,14 +145,27 @@ const PerfilPage = ({ navigation }) => {
           data={tarefas}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
-            const { circleColor, backgroundColor } = getStatusColor(item.prazoFinalizacao); // Pegando a cor da bolinha e fundo
+            const { circleColor, backgroundColor } = getStatusColor(
+              item.prazoFinalizacao
+            );
             return (
-              <View style={[styles.tarefaItem, { backgroundColor }]}>
+              <View
+                style={[styles.tarefaItem, { backgroundColor }]}
+              >
                 <View style={styles.tarefaStatusContainer}>
-                  <View style={[styles.statusCircle, { backgroundColor: circleColor }]} />
-                  <Text style={styles.tarefaTitle}>{item.objetivo}</Text>
+                  <View
+                    style={[
+                      styles.statusCircle,
+                      { backgroundColor: circleColor },
+                    ]}
+                  />
+                  <Text style={styles.tarefaTitle}>
+                    {item.objetivo || "Sem título"}
+                  </Text>
                 </View>
-                <Text style={styles.tarefaPrazo}>Prazo: {item.prazoFinalizacao}</Text>
+                <Text style={styles.tarefaPrazo}>
+                  Prazo: {item.prazoFinalizacao || "Indefinido"}
+                </Text>
               </View>
             );
           }}
@@ -148,20 +173,19 @@ const PerfilPage = ({ navigation }) => {
       )}
 
       {section === "perfil" && funcionario && (
-
         <FlatList
           contentContainerStyle={{
             paddingHorizontal: 20,
           }}
           data={[
-            { label: "Nome", value: funcionario.nome },
-            { label: "Função", value: funcionario.funcao },
-            { label: "Email", value: funcionario.email },
-            { label: "Telefone", value: funcionario.telefone },
-            { label: "Tipo de Contratação", value: funcionario.tipoContratacao },
-            { label: "CPF", value: funcionario.CPF },
-            { label: "Data de Nascimento", value: funcionario.dataNascimento },
-            { label: "Estado Civil", value: funcionario.estadoCivil },
+            { label: "Nome", value: funcionario.nome || "Não disponível" },
+            { label: "Função", value: funcionario.funcao || "Não disponível" },
+            { label: "Email", value: funcionario.email || "Não disponível" },
+            { label: "Telefone", value: funcionario.telefone || "Não disponível" },
+            { label: "Tipo de Contratação", value: funcionario.tipoContratacao || "Não disponível" },
+            { label: "CPF", value: funcionario.CPF || "Não disponível" },
+            { label: "Data de Nascimento", value: funcionario.dataNascimento || "Não disponível" },
+            { label: "Estado Civil", value: funcionario.estadoCivil || "Não disponível" },
           ]}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (

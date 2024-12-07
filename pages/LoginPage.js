@@ -148,18 +148,20 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 82,
   },
   text: {
-    fontSize: 32,
+    fontSize: 40,
     fontWeight: "bold",
     color: '#fff',
     fontWeight: 'bold',
+    Top:"-10%",
   },
   text2: {
     fontSize: 18,
    fontWeight: "light",
     color: '#fff',
+    top:'7%',
   },
   button: {
-    backgroundColor: '#264357',
+    backgroundColor: '#468fb8',
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 20, 
