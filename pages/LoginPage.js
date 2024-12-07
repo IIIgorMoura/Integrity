@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image} from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { db } from "../configs/firebaseConfig";
@@ -67,7 +67,7 @@ const LoginPage = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <LinearGradient colors={['#155576b3', '#46201B']} style={styles.bemvindo}>
-
+      <Image source={require('../assets/logo.png')} style={styles.logo} />
         <Text style={styles.text}>BEM-VINDO!</Text>
         <Text style={styles.text2}>Faça login para continuar</Text>
       </LinearGradient>
@@ -80,6 +80,7 @@ const LoginPage = ({ navigation }) => {
           value={email}
           onChangeText={setEmail}
           placeholder="Digite seu email"
+             placeholderTextColor="#888"
         />
         <View style={styles.inputos}>
           <Text style={styles.Texto}>Senha:</Text>
@@ -89,6 +90,7 @@ const LoginPage = ({ navigation }) => {
           value={password}
           onChangeText={setPassword}
           placeholder="Digite sua senha"
+             placeholderTextColor="#888"
           secureTextEntry
         />
         <TouchableOpacity style={styles.button} onPress={loginUser}>
@@ -137,8 +139,14 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 10,
   },
+  logo: {
+    width: 60,
+    height: 60,
+    marginBottom: 10,
+  },
+
   bemvindo: {
-    paddingTop: '20%',
+    paddingTop: '10%',
     paddingBottom: '10%',
     height: '35%',
     width: '100%',
@@ -161,7 +169,7 @@ const styles = StyleSheet.create({
     top:'7%',
   },
   button: {
-    backgroundColor: '#468fb8',
+      backgroundColor: '#0d4e80',
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 20, 

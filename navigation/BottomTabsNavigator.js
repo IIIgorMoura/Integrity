@@ -11,6 +11,7 @@ const Tab = createBottomTabNavigator();
 
 const BottomTabsNavigator = () => (
   <Tab.Navigator
+    initialRouteName="Perfil" // Definindo a tela inicial como "Perfil"
     screenOptions={({ route }) => ({
       tabBarIcon: ({ color, size }) => {
         let iconName;
@@ -42,30 +43,30 @@ const BottomTabsNavigator = () => (
     }}
     />
     <Tab.Screen
-  name="Perfil"
-  component={PerfilPage}
-  options={{
-    headerTitle: () => null, 
-    headerRight: () => (
-      <Image
-        source={require('../assets/logo.png')}
-        style={{
-          width: "30%",
-          height: "80%", 
-          marginTop: 20,
-          marginRight: 16,
-          resizeMode: 'contain', 
-        }}
-      />
-    ),
-    headerStyle: {
-      backgroundColor: 'transparent',
-      elevation: 0, 
-      shadowOpacity: 0,
-    },
-    headerTransparent: true, 
-  }}
-/>
+      name="Perfil"
+      component={PerfilPage}
+      options={{
+        headerTitle: () => null, 
+        headerRight: () => (
+          <Image
+            source={require('../assets/logo.png')}
+            style={{
+              width: "30%",
+              height: "80%", 
+              marginTop: 20,
+              marginRight: 16,
+              resizeMode: 'contain', 
+            }}
+          />
+        ),
+        headerStyle: {
+          backgroundColor: 'transparent',
+          elevation: 0, 
+          shadowOpacity: 0,
+        },
+        headerTransparent: true, 
+      }}
+    />
     <Tab.Screen name="Chat" component={ChatPage} 
     options={{
       headerTitle: () => null, 
@@ -100,6 +101,5 @@ const styles = StyleSheet.create({
     color: "#468FB8", // Cor do texto ativo
   },
 });
-
 
 export default BottomTabsNavigator;
