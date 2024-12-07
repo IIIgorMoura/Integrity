@@ -70,7 +70,7 @@ const ChatPage = () => {
         text: message,
         userId: user.uid,
         userName: userName,
-        timestamp: Timestamp.fromDate(new Date()), 
+        timestamp: Timestamp.fromDate(new Date()), // Garante o timestamp correto
       });
 
       setMessage(""); 
