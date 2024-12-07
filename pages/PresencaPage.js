@@ -1,40 +1,59 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Button } from "react-native";
-import { CameraView, useCameraPermissions } from "expo-camera";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, Button, Alert } from "react-native";
+import { CameraView, Camera } from "expo-camera";
 
 const PresencaPage = () => {
-  const [facing, setFacing] = useState("back"); // Alterna entre 'back' e 'front'
-  const [permission, requestPermission] = useCameraPermissions();
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false); // Indica se o QR code já foi escaneado
 
-  // Verifica se a permissão está carregando
-  if (!permission) {
-    return <View />;
-  }
+  // Solicitar permissão para usar a câmera
+  useEffect(() => {
+    const getCameraPermissions = async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === "granted");
+    };
 
-  // Solicita permissão se ainda não foi concedida
-  if (!permission.granted) {
+    getCameraPermissions();
+  }, []);
+
+  // Função chamada após escanear o QR code
+  const handleBarcodeScanned = ({ type, data }) => {
+    setScanned(true); // Bloqueia escaneamentos adicionais até que o estado seja resetado
+    Alert.alert("QR Code Escaneado!", `Tipo: ${type}\nConteúdo: ${data}`, [
+      { text: "OK", onPress: () => setScanned(false) }, // Reseta o estado
+    ]);
+  };
+
+  // Caso o usuário não tenha permitido acesso à câmera
+  if (hasPermission === null) {
     return (
       <View style={styles.container}>
-        <Text style={styles.message}>Precisamos da sua permissão para usar a câmera.</Text>
-        <Button title="Conceder permissão" onPress={requestPermission} />
+        <Text>Solicitando permissão para usar a câmera...</Text>
       </View>
     );
   }
 
-  // Alterna entre câmera frontal e traseira
-  const toggleCameraFacing = () => {
-    setFacing((current) => (current === "back" ? "front" : "back"));
-  };
+  if (hasPermission === false) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.message}>Precisamos da sua permissão para usar a câmera.</Text>
+        <Button title="Conceder permissão" onPress={() => Camera.requestCameraPermissionsAsync()} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <Text style={styles.text}>Trocar Câmera</Text>
-          </TouchableOpacity>
-        </View>
-      </CameraView>
+      <CameraView
+        onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
+        barcodeScannerSettings={{
+          barcodeTypes: ["qr"], // Escaneia apenas QR Codes
+        }}
+        style={styles.camera}
+      />
+      {scanned && (
+        <Button title={"Escanear Novamente"} onPress={() => setScanned(false)} />
+      )}
     </View>
   );
 };
@@ -52,25 +71,6 @@ const styles = StyleSheet.create({
   camera: {
     flex: 1,
     width: "100%",
-  },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: "row",
-    backgroundColor: "transparent",
-    margin: 64,
-    justifyContent: "center",
-  },
-  button: {
-    alignSelf: "flex-end",
-    alignItems: "center",
-    backgroundColor: "#00000088",
-    padding: 10,
-    borderRadius: 8,
-  },
-  text: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "white",
   },
 });
 
