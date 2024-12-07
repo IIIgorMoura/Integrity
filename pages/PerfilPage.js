@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Button,
-  FlatList,
-  Switch,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-} from "react-native";
+import { View, Text, Button, FlatList, Switch, StyleSheet, TouchableOpacity, Image, } from "react-native";
 import { db } from "../configs/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -89,11 +80,11 @@ const PerfilPage = ({ navigation }) => {
     const daysDiff = timeDiff / (1000 * 3600 * 24);
 
     if (daysDiff < 0) {
-      return { circleColor: "red", backgroundColor: "#d3d3d3" };
+      return { circleColor: "red", backgroundColor: "#303030" };
     } else if (daysDiff <= 7) {
-      return { circleColor: "yellow", backgroundColor: "#fff" };
+      return { circleColor: "yellow", backgroundColor: "#303030" };
     } else {
-      return { circleColor: "green", backgroundColor: "#fff" };
+      return { circleColor: "green", backgroundColor: "#303030" };
     }
   };
 
@@ -139,7 +130,7 @@ const PerfilPage = ({ navigation }) => {
           <Text style={styles.buttonText}>Configurações</Text>
         </TouchableOpacity>
       </View>
-
+      {/* tarefas--------------------- */}
       {section === "tarefas" && (
         <FlatList
           data={tarefas}
@@ -163,9 +154,20 @@ const PerfilPage = ({ navigation }) => {
                     {item.objetivo || "Sem título"}
                   </Text>
                 </View>
+                <Text style={styles.tarefalider}>
+                  <Icon name="child" size={20} color="#49BF6C" />
+                  {item.prazoFinalizacao || "Indefinido"}
+                </Text>
+                <Text style={styles.tarefacolaborador}>
+                  <Icon name="street-view" size={20} color="#1873C7" />
+                  {item.prazoFinalizacao || "Indefinido"}
+                </Text>
                 <Text style={styles.tarefaPrazo}>
                   Prazo: {item.prazoFinalizacao || "Indefinido"}
                 </Text>
+                <TouchableOpacity style={styles.detalhes}>
+                  <Text style={styles.detalhestexto}>Ver detalhes</Text>
+                </TouchableOpacity>
               </View>
             );
           }}
@@ -253,9 +255,11 @@ const styles = StyleSheet.create({
     fontWeight: "regular",
   },
   tarefaItem: {
+    display: "flex",
+    flexDirection: "column",
     padding: 12,
     borderRadius: 10,
-    marginBottom: 8,
+    marginBottom: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -274,12 +278,27 @@ const styles = StyleSheet.create({
   },
   tarefaTitle: {
     fontSize: 16,
+    color: '#fff',
     fontWeight: "bold",
+    marginBottom: 5,
   },
   tarefaPrazo: {
-    fontSize: 14,
-    color: "#555",
+    fontSize: 15,
+    marginBottom: 5,
+    color: "#fff",
+    
   },
+  tarefalider: {
+    fontSize: 15,
+    marginBottom: 5,
+    color: "#fff",
+  },
+  tarefacolaborador: {
+    fontSize: 15,
+    marginBottom: 5,
+    color: "#fff",
+  },
+
   perfilContainer: {
     display: "flex",
     width: "100%",
@@ -354,6 +373,22 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#fff",
     marginBottom: 10,
+  },
+  detalhes: {
+    display: "flex",
+    width: "100%",
+    height: "auto",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 10,
+    backgroundColor: "#1873C7",
+    marginTop: 20,
+    borderRadius: 10,
+  },
+  detalhestexto: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: "bold",
   },
 });
 
