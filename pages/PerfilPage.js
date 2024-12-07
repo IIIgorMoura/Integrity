@@ -4,7 +4,6 @@ import { db } from "../configs/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { ScrollView } from "react-native-web";
 import { LinearGradient } from 'expo-linear-gradient';
 
 const PerfilPage = ({ navigation }) => {
@@ -13,6 +12,10 @@ const PerfilPage = ({ navigation }) => {
   const [tarefas, setTarefas] = useState([]);
   const [funcionario, setFuncionario] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [usuario, setUsuario] = useState(null);
+
+
+  
 
   useEffect(() => {
     const fetchEmpresaId = async () => {
@@ -22,6 +25,8 @@ const PerfilPage = ({ navigation }) => {
 
     fetchEmpresaId();
   }, []);
+
+  
 
   useEffect(() => {
     if (empresaId) {
@@ -85,8 +90,8 @@ const PerfilPage = ({ navigation }) => {
   return (
     <LinearGradient colors={['#1A2C36', '#291B1A', '#161616']} style={styles.container}>
       <View style={styles.apresentacao}>
-        <Text style={styles.bemvindo}></Text>
-
+         <Text style={styles.bemvindo}>Olá </Text> {/*// botar o usuario aqui */}
+        <Text style={styles.identificacao}></Text>
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
@@ -145,9 +150,9 @@ const PerfilPage = ({ navigation }) => {
       {section === "perfil" && funcionario && (
 
         <FlatList
-        contentContainerStyle={{
-          paddingHorizontal: 20,
-        }}
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+          }}
           data={[
             { label: "Nome", value: funcionario.nome },
             { label: "Função", value: funcionario.funcao },
@@ -189,8 +194,8 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     display: "flex",
-    width:"100%",
-    height:"10%",
+    width: "100%",
+    height: "10%",
     backgroundColor: "#303030",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -214,7 +219,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     width: "30%",
-    height:"100%",
+    height: "100%",
     flexDirection: "column",
 
   },
@@ -259,7 +264,7 @@ const styles = StyleSheet.create({
   },
   perfilText: {
     fontSize: 16,
-    fontWeight: "regular", 
+    fontWeight: "regular",
     marginBottom: 10,
     color: "#fff",
   },
@@ -299,7 +304,7 @@ const styles = StyleSheet.create({
   },
   activeButton: {
     borderWidth: 0,
-    borderBottomWidth:3,
+    borderBottomWidth: 3,
     borderBottomColor: "#fff",
   },
   retangulo: {
@@ -307,18 +312,25 @@ const styles = StyleSheet.create({
     height: "40%",
     justifyContent: "flex-end",
   },
-  apresentacao: {
-    display: "flex",
-    width: "100%",
-    height: "25%",
-  },
   logo: {
     width: "10%",
     height: "10%",
   },
-  bemvindo:{
 
-  }
+  apresentacao: {
+    display: "flex",
+    width: "100%",
+    height: "30%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  bemvindo: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 10,
+  },
 });
 
 export default PerfilPage;
