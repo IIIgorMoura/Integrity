@@ -136,7 +136,7 @@ const PerfilPage = ({ navigation }) => {
           onPress={() => setSection("configuracoes")}
         >
           <Icon name="cogs" size={20} color="#fff" />
-          <Text style={styles.buttonText}>Configurações</Text>
+          <Text style={styles.buttonText}>Ajustes</Text>
         </TouchableOpacity>
       </View>
 

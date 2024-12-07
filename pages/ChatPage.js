@@ -61,6 +61,7 @@ const ChatPage = () => {
     }
 
     try {
+      const userName = user.displayName || "Usuário desconhecido"; 
 
       const messagesRef = collection(db, `empresas/${empresaId}/funcionarios/${funcionarioId}/historicoChat`);
 
@@ -68,6 +69,7 @@ const ChatPage = () => {
       await addDoc(messagesRef, {
         text: message,
         userId: user.uid,
+        userName: userName,
         timestamp: Timestamp.fromDate(new Date()), 
       });
 
@@ -91,7 +93,7 @@ const ChatPage = () => {
     return (
       <View style={item.userId === user.uid ? styles.sentMessage : styles.receivedMessage}>
         <Text style={styles.messageText}>
-          {item.text}
+          {item.userName && item.userName !== "Usuário desconhecido" ? `${item.userName}: ` : ""}{item.text}
         </Text>
       </View>
     );
@@ -102,7 +104,7 @@ const ChatPage = () => {
       {/* Título e subtítulo */}
       <View style={styles.header}>
         <Text style={styles.title}>Chat de Suporte</Text>
-        <Text style={styles.subtitle}>Fale com um atendente ou consulte as dúvidas frequentes.</Text>
+        <Text style={styles.subtitle}>Fale com seu superior ou suba arquivos.</Text>
       </View>
 
       <FlatList
@@ -145,6 +147,8 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#333",
     alignItems: "center",
+    borderBottomRightRadius:10,
+    borderBottomLeftRadius:10,
   },
   title: {
     fontSize: 24,
