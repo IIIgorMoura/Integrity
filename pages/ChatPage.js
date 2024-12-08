@@ -1,9 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, KeyboardAvoidingView, Platform, Keyboard } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  Image,
+} from "react-native";
 import { db } from "../configs/firebaseConfig";
-import { collection, addDoc, query, orderBy, onSnapshot, Timestamp } from "firebase/firestore";
+import { collection, addDoc, query, orderBy, onSnapshot } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { Ionicons, Entypo } from "@expo/vector-icons";
 
 const ChatPage = () => {
   const [message, setMessage] = useState("");
@@ -13,7 +25,6 @@ const ChatPage = () => {
   const [funcionarioId, setFuncionarioId] = useState(null);
   const flatListRef = useRef(null); // Referência para o FlatList
 
-  // Carregar dados do usuário e empresa
   useEffect(() => {
     const loadData = async () => {
       const storedUsuario = await AsyncStorage.getItem("usuario");
@@ -34,101 +45,117 @@ const ChatPage = () => {
     loadData();
   }, []);
 
-  // Ouvir as mensagens em tempo real
   useEffect(() => {
     if (empresaId && funcionarioId) {
       const messagesRef = collection(db, `empresas/${empresaId}/funcionarios/${funcionarioId}/historicoChat`);
       const q = query(messagesRef, orderBy("timestamp"));
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const messagesList = querySnapshot.docs.map(doc => ({
+        const messagesList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
         setMessages(messagesList);
       });
 
-      // Limpar o listener quando a tela for desmontada
       return () => unsubscribe();
     }
   }, [empresaId, funcionarioId]);
 
-  // Função para enviar mensagens
   const sendMessage = async () => {
     if (message.trim() === "") return;
-    if (!user || !user.uid) {
-      console.error("Erro: Usuário não autenticado.");
-      return;
-    }
 
     try {
-      const userName = user.displayName || "Usuário desconhecido"; 
-
+      const userName = user?.displayName || "Usuário desconhecido";
       const messagesRef = collection(db, `empresas/${empresaId}/funcionarios/${funcionarioId}/historicoChat`);
 
-      // Adicionar a mensagem no Firestore
       await addDoc(messagesRef, {
         text: message,
         userId: user.uid,
         userName: userName,
-        timestamp: new Date().toISOString(), // Garante o timestamp correto
+        timestamp: new Date().toISOString(),
       });
 
-      setMessage(""); 
+      setMessage("");
     } catch (error) {
       console.error("Erro ao enviar mensagem:", error);
     }
   };
 
-  // Rolar automaticamente para a última mensagem
+  const handlePickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert("Permissão para acessar a galeria é necessária!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      try {
+        const messagesRef = collection(db, `empresas/${empresaId}/funcionarios/${funcionarioId}/historicoChat`);
+
+        await addDoc(messagesRef, {
+          imageUrl: result.assets[0].uri,
+          userId: user.uid,
+          userName: user.displayName || "Usuário desconhecido",
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        console.error("Erro ao enviar imagem:", error);
+      }
+    }
+  };
+
   useEffect(() => {
-    // Espera o layout ser renderizado e as mensagens estarem disponíveis
     if (flatListRef.current && messages.length > 0) {
       setTimeout(() => {
         flatListRef.current.scrollToEnd({ animated: true });
-      }, 100); // Delay para garantir que as mensagens foram renderizadas
+      }, 100);
     }
-  }, [messages]); // Rola quando novas mensagens são recebidas
+  }, [messages]);
 
-  const renderMessageItem = ({ item }) => {
-    return (
-      <View style={item.userId === user.uid ? styles.sentMessage : styles.receivedMessage}>
+  const renderMessageItem = ({ item }) => (
+    <View style={item.userId === user?.uid ? styles.sentMessage : styles.receivedMessage}>
+      {item.imageUrl ? (
+        <Image source={{ uri: item.imageUrl }} style={styles.imageMessage} />
+      ) : (
         <Text style={styles.messageText}>
-          {item.userName && item.userName !== "Usuário desconhecido" ? `${item.userName}: ` : ""}{item.text}
+          {item.userName && item.userName !== "Usuário desconhecido" ? `${item.userName}: ` : ""}
+          {item.text}
         </Text>
-      </View>
-    );
-  };
+      )}
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-      {/* Título e subtítulo */}
       <View style={styles.header}>
         <Text style={styles.title}>Chat de Suporte</Text>
-        <Text style={styles.subtitle}>Fale com seu superior ou suba arquivos.</Text>
+        <Text style={styles.subtitle}>Fale com seu superior ou envie arquivos.</Text>
       </View>
 
       <FlatList
-        ref={flatListRef} // Referência para o FlatList
+        ref={flatListRef}
         data={messages}
         renderItem={renderMessageItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.messagesContainer}
-        keyboardShouldPersistTaps="handled" // Permite que a interação com a lista não seja bloqueada pelo teclado
+        keyboardShouldPersistTaps="handled"
       />
 
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.inputContainer}>
+        <TouchableOpacity style={styles.clipButton} onPress={handlePickImage}>
+          <Entypo name="attachment" size={24} color="#fff" />
+        </TouchableOpacity>
         <TextInput
           style={styles.input}
           placeholder="Digite sua mensagem..."
           value={message}
           onChangeText={setMessage}
           placeholderTextColor="#aaa"
-          onFocus={() => {
-            // Garante que ao focar o campo de texto, a lista de mensagens role para o fim
-            if (flatListRef.current) {
-              flatListRef.current.scrollToEnd({ animated: true });
-            }
-          }}
         />
         <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
           <Ionicons name="send" size={24} color="#fff" />
@@ -139,81 +166,41 @@ const ChatPage = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#121212", 
+  container: { flex: 1, backgroundColor: "#121212" },
+  header: { padding: 20, backgroundColor: "#333", alignItems: "center" },
+  title: { fontSize: 24, fontWeight: "bold", color: "#fff" },
+  subtitle: { fontSize: 14, color: "#aaa", marginTop: 5 },
+  messagesContainer: { paddingTop: 10, paddingBottom: 60 },
+  sentMessage: { 
+    alignSelf: "flex-end", 
+    backgroundColor: "#468fb8", 
+    padding: 10, 
+    borderRadius: 7, 
+    margin: 5, 
+    width: "80%", // Limita a largura da mensagem enviada
   },
-  header: {
-    padding: 20,
-    backgroundColor: "#333",
-    alignItems: "center",
-    borderBottomRightRadius:10,
-    borderBottomLeftRadius:10,
+  receivedMessage: { 
+    alignSelf: "flex-start", 
+    backgroundColor: "gray", 
+    padding: 10, 
+    borderRadius: 7, 
+    margin: 5, 
+    width: "80%", // Limita a largura da mensagem recebida
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#aaa",
-    marginTop: 5,
-  },
-  messagesContainer: {
-    paddingTop: 10,
-    paddingBottom: 60, // Espaço para o campo de entrada
-  },
-  sentMessage: {
-    alignSelf: "flex-end",
-    backgroundColor: "rgba(70, 143, 184,  0.3)", // Cor mais transparente
-    padding: 10,
-    borderRadius: 7,
-    margin: 5,
-    maxWidth: "80%",
-    shadowColor: "#000", 
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-  },
-  receivedMessage: {
-    alignSelf: "flex-start",
-    backgroundColor: "rgba(255, 255, 255, 0.3)", // Cor mais transparente
-    padding: 10,
-    borderRadius: 20,
-    margin: 5,
-    maxWidth: "80%",
-    shadowColor: "#000", 
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-  },
-  messageText: {
-    color: "#fff", 
-    fontSize: 16,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-    bottom: 0,
-    width: "100%",
-  },
-  input: {
-    flex: 1,
+  messageText: { color: "#fff", fontSize: 16 },
+  inputContainer: { flexDirection: "row", alignItems: "center", padding: 10 },
+  input: { 
+    flex: 1, 
     backgroundColor: "#333", 
     color: "#fff", 
-    padding: 10,
-    borderRadius: 20,
-    marginRight: 10,
-    borderWidth: 1,
-    borderColor: "#444", 
+    padding: 10, 
+    borderRadius: 20, 
+    marginRight: 10, 
   },
-  sendButton: {
-    backgroundColor: "#468fb8", 
-    padding: 10,
-    borderRadius: 50,
-  },
+  clipButton: { marginRight: 10 },
+  sendButton: { backgroundColor: "#468fb8", padding: 10, borderRadius: 50 },
+  imageMessage: { width: 290, height: 280, borderRadius: 10 },
 });
+
 
 export default ChatPage;
