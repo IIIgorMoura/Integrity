@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, FlatList, Switch, StyleSheet, TouchableOpacity, Image, } from "react-native";
+import { View, Text, Button, FlatList, Switch, StyleSheet, TouchableOpacity, Image, Modal } from "react-native";
 import { db } from "../configs/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { LinearGradient } from "expo-linear-gradient";
+import { ActionModal } from '../src/ActionModal'
 
 const PerfilPage = ({ navigation }) => {
   const [section, setSection] = useState("tarefas");
@@ -12,6 +13,20 @@ const PerfilPage = ({ navigation }) => {
   const [tarefas, setTarefas] = useState([]);
   const [funcionario, setFuncionario] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedTarefa, setSelectedTarefa] = useState(null);
+  const [visibleModal, setVisibleModal] = useState(false);
+
+
+
+  // abrir modal
+  const openModalWithTarefa = (tarefa) => {
+    setSelectedTarefa(tarefa);
+    setVisibleModal(true);
+  };
+
+  //--------- 
+
 
   useEffect(() => {
     const fetchEmpresaId = async () => {
@@ -31,6 +46,8 @@ const PerfilPage = ({ navigation }) => {
       }
     }
   }, [section, empresaId]);
+
+  
 
   const fetchTarefas = async () => {
     try {
@@ -67,6 +84,8 @@ const PerfilPage = ({ navigation }) => {
     }
   };
 
+  
+
   const logout = async () => {
     await AsyncStorage.removeItem("usuario");
     await AsyncStorage.removeItem("empresaId");
@@ -87,6 +106,8 @@ const PerfilPage = ({ navigation }) => {
       return { circleColor: "green", backgroundColor: "#303030" };
     }
   };
+
+
 
   return (
     <LinearGradient
@@ -165,7 +186,7 @@ const PerfilPage = ({ navigation }) => {
                 <Text style={styles.tarefaPrazo}>
                   Prazo: {item.prazoFinalizacao || "Indefinido"}
                 </Text>
-                <TouchableOpacity style={styles.detalhes}>
+                <TouchableOpacity style={styles.detalhes} onPress={() => openModalWithTarefa(item)}>
                   <Text style={styles.detalhestexto}>Ver detalhes</Text>
                 </TouchableOpacity>
               </View>
@@ -208,6 +229,20 @@ const PerfilPage = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       )}
+      <Modal
+  visible={visibleModal}
+  transparent={true}
+  onRequestClose={() => setVisibleModal(false)}
+>
+  <ActionModal
+    handleClose={() => setVisibleModal(false)}
+    empresaId={empresaId}
+    tarefa={selectedTarefa}
+    
+  />
+</Modal>
+
+
     </LinearGradient>
   );
 };
@@ -286,7 +321,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginBottom: 5,
     color: "#fff",
-    
+
   },
   tarefalider: {
     fontSize: 15,
