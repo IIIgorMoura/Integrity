@@ -77,8 +77,6 @@ const PerfilPage = ({ navigation }) => {
         .map((doc) => doc.data())
         .find((func) => func.email === usuario.email);
 
-      let colaboradoresList = item.colaboradores.lenght
-
       if (funcionarioData) {
         setFuncionario(funcionarioData);
       }
