@@ -62,101 +62,87 @@ export function ActionModal({ handleClose, tarefa }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  fundo: {
-    width: "100%",
-    height: "22%",
-    zIndex: 9,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  content2: {
-    width: "100%",
-    display: "flex",
-    flexDirection: "column",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    height: "56%",
-    padding: 10,
-    flexWrap: "wrap",
-  },
-  content: {
-    width: "100%",
-    height: "100%",
-    paddingVertical: 20,
-    paddingHorizontal: 10,
-    backgroundColor: "#131A2F",
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#fff",
-    flexWrap: "wrap",
-  },
-  modalTitle: {
-    fontSize: 12,
-    fontWeight: "thin",
-    marginBottom: 10,
-    color: "#fff",
-  },
-  tarefaTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 10,
-  },
-  tarefaPrazo: {
-    fontSize: 14,
-    color: "#fff",
-    marginBottom: 20,
-  },
-  tarefalider: {
-    fontSize: 16,
-    marginBottom: 5,
-    color: "#fff",
-    marginBottom: 10,
-  },
-  tarefacolaborador: {
-    fontSize: 16,
-    marginBottom: 5,
-    color: "#fff",
-    marginBottom: 10,
-  },
-  metas: {
-    display: "flex",
-    height: "auto",
-    width: "100%",
-    backgroundColor: "#131A2F",
-    flexDirection: "column",
-    padding: 5,
-    flexWrap: "wrap",
-  },
-  titulometas: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 20,
-  },
-  checkboxContainer: {
-    width: "auto%",
-    height: "auto",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    margin: 5,
-  },
-  label: {
-    fontSize: 15,
-    fontWeight: "thin",
-    color: "#fff",
-  },
-  metas2: {
-    display: "flex",
-    width: "100%",
-    height: "auto",
-    flexDirection: "row",
-    padding: 3,
-  },
-  input: {
-    alignSelf: 'center',
-    marginRight: 5,
-  },
-});
+    container: {
+      flex: 1,
+    },
+    fundo: {
+      width: "100%",
+      height: "22%",
+      zIndex: 9,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    content2: {
+      width: "100%",
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      padding: 10,
+    },
+    content: {
+      width: "100%",
+      flex: 1, // Permite que o conteúdo ocupe o espaço necessário
+      paddingVertical: 20,
+      paddingHorizontal: 10,
+      backgroundColor: "#131A2F",
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: "#fff",
+      overflow: "hidden", // Garante que conteúdo adicional não vaze
+    },
+    modalTitle: {
+      fontSize: 16,
+      fontWeight: "bold",
+      marginBottom: 10,
+      color: "#fff",
+      textAlign: "center", // Centraliza o título
+    },
+    tarefaTitle: {
+      fontSize: 20,
+      fontWeight: "bold",
+      color: "#fff",
+      marginBottom: 10,
+    },
+    tarefaPrazo: {
+      fontSize: 14,
+      color: "#fff",
+      marginBottom: 20,
+    },
+    tarefalider: {
+      fontSize: 16,
+      color: "#fff",
+      marginBottom: 10,
+    },
+    tarefacolaborador: {
+      fontSize: 16,
+      color: "#fff",
+      marginBottom: 10,
+    },
+    metas: {
+      flex: 1,
+      width: "100%",
+      backgroundColor: "#131A2F",
+      flexDirection: "column",
+      padding: 10,
+    },
+    titulometas: {
+      fontSize: 20,
+      fontWeight: "bold",
+      color: "#fff",
+      marginBottom: 10,
+      textAlign: "center", // Centraliza o título das metas
+    },
+    checkboxContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginVertical: 5,
+    },
+    label: {
+      fontSize: 15,
+      color: "#fff",
+      marginLeft: 10,
+    },
+    metas2: {
+      width: "100%",
+      flexDirection: "column", // Alinha checkboxes em coluna para evitar cortes
+      gap: 10, // Espaçamento entre os itens
+    },
+  });
