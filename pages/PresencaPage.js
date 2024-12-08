@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { CameraView, Camera } from "expo-camera";
 import * as Location from "expo-location";
 import { MaterialIcons } from "@expo/vector-icons";
-import { collection, getDoc, doc } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { db } from "../configs/firebaseConfig";
 
@@ -61,6 +61,49 @@ const PresencaPage = () => {
     fetchEmpresaInfo();
   }, []);
 
+  const marcarPresenca = async () => {
+    try {
+      // Recuperar os dados do funcionário logado
+      const funcionarioId = await AsyncStorage.getItem("funcionarioId");
+      const empresaId = await AsyncStorage.getItem("empresaId");
+  
+      if (!funcionarioId || !empresaId) {
+        Alert.alert("Erro", "Funcionário ou empresa não encontrados.");
+        return;
+      }
+  
+      // Data e horário atuais
+      const hoje = new Date();
+      const dataAtual = hoje.toISOString().split("T")[0]; // Formato: YYYY-MM-DD
+      const horarioAtual = hoje.toTimeString().split(" ")[0]; // Formato: HH:MM:SS
+  
+      // Referência à subcoleção `datasPresentes`
+      const funcionarioDocRef = doc(db, `empresas/${empresaId}/funcionarios`, funcionarioId);
+      const presencaSubcollectionRef = collection(funcionarioDocRef, "datasPresentes");
+  
+      // Verificar se o documento do dia já existe
+      const presencaDocRef = doc(presencaSubcollectionRef, dataAtual);
+      const presencaDoc = await getDoc(presencaDocRef);
+  
+      if (presencaDoc.exists()) {
+        Alert.alert("Aviso", "Presença já registrada para hoje.");
+        return;
+      }
+  
+      // Criar novo documento para a presença
+      await setDoc(presencaDocRef, {
+        data: dataAtual,
+        horarioEntrada: horarioAtual,
+        localizacao: userLocation || null,
+      });
+  
+      Alert.alert("Sucesso", "Presença registrada com sucesso.");
+    } catch (error) {
+      console.error("Erro ao marcar presença:", error);
+      Alert.alert("Erro", "Não foi possível registrar a presença.");
+    }
+  };
+
   const handleBarcodeScanned = () => {
     setScanned(true);
   };
@@ -93,10 +136,7 @@ const PresencaPage = () => {
           )}
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => Alert.alert("Presença Marcada!", "Presença registrada com sucesso.")}
-            >
+            <TouchableOpacity style={styles.button} onPress={marcarPresenca}>
               <MaterialIcons name="check" size={20} color="white" />
               <Text style={styles.buttonText}>Marcar Presença</Text>
             </TouchableOpacity>
