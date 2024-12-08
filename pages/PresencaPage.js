@@ -76,7 +76,7 @@ const PresencaPage = () => {
     <View style={styles.container}>
       {scanned ? (
         <View style={styles.infoContainer}>
-          <View>
+          <View style={styles.infoLargura}>
             <Text style={styles.infoTitle}>Nome da Empresa</Text>
             <Text style={styles.infoText}>{empresaInfo.nome}</Text>
 
@@ -84,7 +84,7 @@ const PresencaPage = () => {
             <Text style={styles.infoText}>{empresaInfo.endereco}</Text>
           </View>
           {userLocation && (
-            <View>
+            <View style={styles.infoLargura}>
               <Text style={styles.infoTitle}>Sua Localização</Text>
               <Text style={styles.infoText}>
                 Latitude: {userLocation.latitude.toFixed(6)}, Longitude: {userLocation.longitude.toFixed(6)}
@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#000",
   },
+  infoLargura: { width: '80%'},
   infoTitle: { fontSize: 20, fontWeight: "bold", marginBottom: 10, color: "#fff" },
   infoText: { fontSize: 16, marginBottom: 20, color: "#fff" },
   buttonContainer: { marginTop: 20 },
