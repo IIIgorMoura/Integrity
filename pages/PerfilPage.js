@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
+<<<<<<< HEAD
 import { View, Text, Button, FlatList, Switch, StyleSheet, TouchableOpacity, Image, Modal } from "react-native";
+=======
+import { View, Text, Button, FlatList, Switch, StyleSheet, TouchableOpacity, Image, } from "react-native";
+>>>>>>> 7d261cc17ec55915eb32ab65f947cde098bba767
 import { db } from "../configs/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -148,7 +152,7 @@ const PerfilPage = ({ navigation }) => {
           onPress={() => setSection("configuracoes")}
         >
           <Icon name="cogs" size={20} color="#fff" />
-          <Text style={styles.buttonText}>Ajustes</Text>
+          <Text style={styles.buttonText}>Ajutes</Text>
         </TouchableOpacity>
       </View>
       {/* tarefas--------------------- */}
@@ -186,7 +190,11 @@ const PerfilPage = ({ navigation }) => {
                 <Text style={styles.tarefaPrazo}>
                   Prazo: {item.prazoFinalizacao || "Indefinido"}
                 </Text>
+<<<<<<< HEAD
                 <TouchableOpacity style={styles.detalhes} onPress={() => openModalWithTarefa(item)}>
+=======
+                <TouchableOpacity style={styles.detalhes}>
+>>>>>>> 7d261cc17ec55915eb32ab65f947cde098bba767
                   <Text style={styles.detalhestexto}>Ver detalhes</Text>
                 </TouchableOpacity>
               </View>
@@ -321,7 +329,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginBottom: 5,
     color: "#fff",
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 7d261cc17ec55915eb32ab65f947cde098bba767
   },
   tarefalider: {
     fontSize: 15,
