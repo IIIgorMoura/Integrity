@@ -3,172 +3,159 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { CameraView, Camera } from "expo-camera";
 import * as Location from "expo-location";
 import { MaterialIcons } from "@expo/vector-icons";
+import { collection, getDoc, doc } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { db } from "../configs/firebaseConfig";
 
 const PresencaPage = () => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
-  const [location, setLocation] = useState(null);
+  const [empresaInfo, setEmpresaInfo] = useState({ nome: "", endereco: "" });
+  const [userLocation, setUserLocation] = useState(null);
 
-  // Coordenadas da empresa (exemplo, substituir pelas reais)
-  const empresaLocation = {
-    latitude: -23.55052, // Latitude da empresa
-    longitude: -46.633308, // Longitude da empresa
-  };
-
-  // Solicitar permissão para usar a câmera
+  // Solicitar permissão para câmera
   useEffect(() => {
     const getCameraPermissions = async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === "granted");
     };
-
     getCameraPermissions();
   }, []);
 
-  // Solicitar permissão para acessar a localização
+  // Solicitar permissão para localização
   useEffect(() => {
     const getLocationPermissions = async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert("Permissão Negada", "Precisamos de acesso à sua localização para registrar presença.");
+        Alert.alert("Permissão Negada", "Precisamos de acesso à sua localização.");
         return;
       }
+      const location = await Location.getCurrentPositionAsync({});
+      setUserLocation(location.coords);
     };
-
     getLocationPermissions();
   }, []);
 
-  // Capturar a localização atual
-  const getCurrentLocation = async () => {
-    try {
-      const currentLocation = await Location.getCurrentPositionAsync({});
-      return currentLocation.coords;
-    } catch (error) {
-      Alert.alert("Erro", "Não foi possível acessar sua localização.");
-      return null;
-    }
-  };
-
-  // Função chamada após escanear o QR code
-  const handleBarcodeScanned = async ({ type, data }) => {
-    setScanned(true);
-    const coords = await getCurrentLocation();
-
-    if (coords) {
-      const distance = calculateDistance(
-        coords.latitude,
-        coords.longitude,
-        empresaLocation.latitude,
-        empresaLocation.longitude
-      );
-
-      if (distance <= 0.1) {
-        // Presença confirmada se distância for <= 100 metros
-        Alert.alert("Presença Marcada!", "Você está na localização correta.");
-      } else {
-        Alert.alert("Tente Novamente!", "Sua localização não é a mesma da empresa.");
+  // Buscar informações da empresa
+  useEffect(() => {
+    const fetchEmpresaInfo = async () => {
+      const empresaId = await AsyncStorage.getItem("empresaId");
+      if (empresaId) {
+        try {
+          const empresaDoc = await getDoc(doc(db, "empresas", empresaId));
+          if (empresaDoc.exists()) {
+            const data = empresaDoc.data();
+            setEmpresaInfo({
+              nome: data.nomeEmpresa || "Nome não disponível",
+              endereco: data.enderecoEmpresa || "Endereço não disponível",
+            });
+          } else {
+            Alert.alert("Erro", "Empresa não encontrada.");
+          }
+        } catch (error) {
+          Alert.alert("Erro", "Não foi possível buscar as informações da empresa.");
+          console.error("Erro ao buscar informações da empresa:", error);
+        }
       }
-    } else {
-      Alert.alert("Erro", "Não foi possível verificar sua localização.");
-    }
-    setScanned(false);
-  };
+    };
+    fetchEmpresaInfo();
+  }, []);
 
-  // Calcular a distância entre duas coordenadas (em km)
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const toRad = (value) => (value * Math.PI) / 180;
-    const R = 6371; // Raio da Terra em km
-    const dLat = toRad(lat2 - lat1);
-    const dLon = toRad(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distância em km
+  const handleBarcodeScanned = () => {
+    setScanned(true);
   };
 
   if (hasPermission === null) {
-    return <View style={styles.container}><Text>Solicitando permissão para usar a câmera...</Text></View>;
+    return <Text>Solicitando permissão...</Text>;
   }
-
   if (hasPermission === false) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.message}>Precisamos da sua permissão para usar a câmera.</Text>
-        <Button title="Conceder permissão" onPress={() => Camera.requestCameraPermissionsAsync()} />
-      </View>
-    );
+    return <Text>Permissão negada para usar a câmera.</Text>;
   }
 
   return (
     <View style={styles.container}>
-      <CameraView
-        onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
-        barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
-        style={styles.camera}
-      >
-        {/* Sobreposição escurecida */}
-        <View style={styles.overlay}>
-          <Text style={styles.title}>Escaneie o QR Code</Text>
-        </View>
+      {scanned ? (
+        <View style={styles.infoContainer}>
+          <View>
+            <Text style={styles.infoTitle}>Nome da Empresa</Text>
+            <Text style={styles.infoText}>{empresaInfo.nome}</Text>
 
-        {/* Botão de "Marcar Presença" */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => Alert.alert("Instrução", "Aponte a câmera para o QR Code para marcar presença.")}
-          >
-            <MaterialIcons name="check" size={20} color="white" />
-            <Text style={styles.buttonText}>Marcar Presença</Text>
-          </TouchableOpacity>
+            <Text style={styles.infoTitle}>Endereço da Empresa</Text>
+            <Text style={styles.infoText}>{empresaInfo.endereco}</Text>
+          </View>
+          {userLocation && (
+            <View>
+              <Text style={styles.infoTitle}>Sua Localização</Text>
+              <Text style={styles.infoText}>
+                Latitude: {userLocation.latitude.toFixed(6)}, Longitude: {userLocation.longitude.toFixed(6)}
+              </Text>
+            </View>
+          )}
+
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => Alert.alert("Presença Marcada!", "Presença registrada com sucesso.")}
+            >
+              <MaterialIcons name="check" size={20} color="white" />
+              <Text style={styles.buttonText}>Marcar Presença</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, styles.secondaryButton]}
+              onPress={() => setScanned(false)}
+            >
+              <MaterialIcons name="refresh" size={20} color="white" />
+              <Text style={styles.buttonText}>Escanear Novamente</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </CameraView>
+      ) : (
+        <CameraView
+          onBarcodeScanned={handleBarcodeScanned}
+          barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+          style={styles.camera}
+        >
+          <View style={styles.overlay}>
+            <Text style={styles.overlayText}>Escaneie o QR Code</Text>
+          </View>
+        </CameraView>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  camera: {
-    flex: 1,
-  },
+  container: { flex: 1 },
+  camera: { flex: 1 },
   overlay: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.6)",
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
-    marginBottom: 20,
-  },
-  buttonContainer: {
-    position: "absolute",
-    bottom: 50,
-    width: "100%",
+  overlayText: { color: "white", fontSize: 18, fontWeight: "bold" },
+  infoContainer: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
+    padding: 20,
+    backgroundColor: "#000",
   },
+  infoTitle: { fontSize: 20, fontWeight: "bold", marginBottom: 10, color: "#fff" },
+  infoText: { fontSize: 16, marginBottom: 20, color: "#fff" },
+  buttonContainer: { marginTop: 20 },
   button: {
     flexDirection: "row",
     backgroundColor: "#007BFF",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
+    marginBottom: 10,
+    justifyContent: "center",
+    width: 250,
   },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    marginLeft: 10,
-  },
+  secondaryButton: { backgroundColor: "#6C757D" },
+  buttonText: { color: "white", fontSize: 16, marginLeft: 10 },
 });
 
 export default PresencaPage;
