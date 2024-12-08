@@ -48,7 +48,7 @@ const PerfilPage = ({ navigation }) => {
     }
   }, [section, empresaId]);
 
-  
+
 
   const fetchTarefas = async () => {
     try {
@@ -77,6 +77,8 @@ const PerfilPage = ({ navigation }) => {
         .map((doc) => doc.data())
         .find((func) => func.email === usuario.email);
 
+      let colaboradoresList = item.colaboradores.lenght
+
       if (funcionarioData) {
         setFuncionario(funcionarioData);
       }
@@ -85,7 +87,7 @@ const PerfilPage = ({ navigation }) => {
     }
   };
 
-  
+
 
   const logout = async () => {
     await AsyncStorage.removeItem("usuario");
@@ -178,14 +180,26 @@ const PerfilPage = ({ navigation }) => {
                 </View>
                 <Text style={styles.tarefalider}>
                   <Icon name="child" size={20} color="#49BF6C" />
-                  {item.prazoFinalizacao || "Indefinido"}
+                  {item.lider || "Indefinido"}
                 </Text>
                 <Text style={styles.tarefacolaborador}>
                   <Icon name="street-view" size={20} color="#1873C7" />
-                  {item.prazoFinalizacao || "Indefinido"}
+                  {item.colaboradores && Array.isArray(item.colaboradores)
+                    ? `${item.colaboradores.length} contribuindo`
+                    : "0 contribuindo"}
                 </Text>
                 <Text style={styles.tarefaPrazo}>
-                  Prazo: {item.prazoFinalizacao || "Indefinido"}
+                  {item.prazoFinalizacao
+                    ? (() => {
+                      const currentDate = new Date();
+                      const deadline = new Date(item.prazoFinalizacao);
+                      const timeDiff = deadline - currentDate;
+                      const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                      return daysDiff > 0
+                        ? `${daysDiff} dias restantes`
+                        : "Prazo encerrado";
+                    })()
+                    : "Indefinido"}
                 </Text>
                 <TouchableOpacity style={styles.detalhes} onPress={() => openModalWithTarefa(item)}>
                   <Text style={styles.detalhestexto}>Ver detalhes</Text>
@@ -231,17 +245,17 @@ const PerfilPage = ({ navigation }) => {
         </View>
       )}
       <Modal
-  visible={visibleModal}
-  transparent={true}
-  onRequestClose={() => setVisibleModal(false)}
->
-  <ActionModal
-    handleClose={() => setVisibleModal(false)}
-    empresaId={empresaId}
-    tarefa={selectedTarefa}
-    
-  />
-</Modal>
+        visible={visibleModal}
+        transparent={true}
+        onRequestClose={() => setVisibleModal(false)}
+      >
+        <ActionModal
+          handleClose={() => setVisibleModal(false)}
+          empresaId={empresaId}
+          tarefa={selectedTarefa}
+
+        />
+      </Modal>
 
 
     </LinearGradient>
