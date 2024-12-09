@@ -67,6 +67,7 @@ export function ActionModal({ handleClose, tarefa, empresaId }) {
           <Text style={styles.closeButtonText}>Fechar</Text>
         </TouchableOpacity>
       </View>
+      <TouchableOpacity style={styles.fundo} onPress={handleClose} />
     </SafeAreaView>
   );
 }
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
   },
   fundo: {
     width: "100%",
-    height: "22%",
+    height: "25%",
     zIndex: 9,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
