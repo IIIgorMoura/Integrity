@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   },
   metaTextConcluido: {
     textDecorationLine: "line-through",
-    color: "#bbb",
+    color: "#fff",
   },
   closeButton: {
     flexDirection: "row",
