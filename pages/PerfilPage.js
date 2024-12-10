@@ -235,12 +235,24 @@ const PerfilPage = ({ navigation }) => {
 
       {section === "configuracoes" && (
         <View style={styles.configContainer}>
-          <Text style={styles.configText}>Modo Escuro:</Text>
-          <Switch value={isDarkMode} onValueChange={setIsDarkMode} />
-          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-            <Text style={styles.buttonText}>Sair da Conta</Text>
-          </TouchableOpacity>
+          <View style={styles.fundo}>  
+        <Text style={styles.configText}>Modo Escuro:</Text>
+        <Switch
+          value={isDarkMode}
+          onValueChange={setIsDarkMode}
+          style={styles.switch}
+          trackColor={{
+            false: '#37a0c0', // Cor do rastro quando desativado
+            true: '#1d1920', // Cor do rastro quando ativado
+          }}
+          thumbColor={isDarkMode ? '#5c2225' : '#58cb98'} // Cor do botão (círculo)
+        />
         </View>
+        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+          <Text style={styles.buttonText}>Sair da Conta</Text>
+        </TouchableOpacity>
+        
+      </View>
       )}
       <Modal
         visible={visibleModal}
@@ -299,8 +311,10 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontSize: 12,
+    fontSize: 18,
     fontWeight: "regular",
+    textAlign:'center'
+
   },
   tarefaItem: {
     display: "flex",
@@ -367,17 +381,24 @@ const styles = StyleSheet.create({
   configContainer: {
     marginTop: 20,
     alignItems: "center",
+    
   },
   configText: {
-    fontSize: 16,
+    marginTop:15,
+    fontSize: 30,
     marginBottom: 10,
+    color:'#fff',
+    left:15
   },
   logoutButton: {
-    backgroundColor: "#d9534f",
+    backgroundColor: "#b51813",
     borderRadius: 30,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    marginTop: 20,
+    alignItems:'center',
+    marginTop: 220,
+    width:'60%',
+    height:50,
   },
   dados: {
     display: "flex",
@@ -436,7 +457,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#fff',
     fontWeight: "bold",
+
   },
+
+  switch: {
+    transform: [{ scaleX: 1.8 }, { scaleY: 1.8 }], 
+    right:'320'
+    
+  },
+
+  fundo:{
+backgroundColor:'#303030',
+width:'80%',
+borderRadius:10,
+height:130
+  }
 });
 
 export default PerfilPage;

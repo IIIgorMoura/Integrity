@@ -47,10 +47,12 @@ export function ActionModal({ handleClose, tarefa, empresaId }) {
                 meta.concluida ? styles.metaConcluida : styles.metaPendente,
               ]}
             >
-              <Checkbox
-                status={meta.concluida ? "checked" : "unchecked"}
-                onPress={() => handleCheckboxChange(index)}
-              />
+             <Checkbox
+                  status={meta.concluida ? "checked" : "unchecked"}
+                  onPress={() => handleCheckboxChange(index)}
+                  color="#468fb8"
+                  uncheckedColor="#468fb8"
+                />
               <Text
                 style={[
                   styles.metaText,
@@ -142,7 +144,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 20,
     padding: 10,
-    backgroundColor: "#d9534f",
+    backgroundColor: "#b51813",
     borderRadius: 10,
   },
   closeButtonText: {
