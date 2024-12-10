@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Button, FlatList, Switch, StyleSheet, TouchableOpacity, Image, Modal } from "react-native";
 import { db } from "../configs/firebaseConfig";
-import CheckBox from '@react-native-community/checkbox';
 import { collection, getDocs } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/FontAwesome";
